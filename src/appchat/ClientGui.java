@@ -1,33 +1,84 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package appchat;
 
-import javax.swing.JLabel;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 
 /**
  *
- * @author student
+ * @author dung
  */
 public class ClientGui extends javax.swing.JFrame {
-
+    private String userName, privateUserName = "";
+    private DataInputStream din;
+    private DataOutputStream dout;
+    private DefaultListModel dlm;
+    private int port;
+    
+    private String USER_LIST_CODE = ":;,./=";
+    private String PRIVATE_MESSAGE_CODE = "#4344554@@@@@67667@@";
+    private String TERMINATE_CODE = "mkoihgteazdcvgyhujb096785542AXTY";
     /**
      * Creates new form ClientGui
      */
     public ClientGui() {
         initComponents();
-        jTextHistory.setEditable(false);
     }
 
-    public ClientGui(String userName, String roomName) {
-        initComponents();
-        jTextHistory.setEditable(false);
-        jLabelRoomName.setText(roomName);
-        jLabelUserName.setText(userName);
+    public ClientGui(String userName, String roomName, Socket s) {
+        this.userName = userName;
+        try{
+            initComponents();
+            dlm = new DefaultListModel();
+            jListUsers.setModel(dlm);
+            jLabelRoomName.setText(roomName);
+            jLabelUserName.setText(userName + ":");
+            jTextAreaHistory.append(String.format("--- [%s] is online.\n", userName));
+            din = new DataInputStream(s.getInputStream());
+            dout = new DataOutputStream(s.getOutputStream());
+            new Read().start();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
+    
+    class Read extends Thread {
+        public void run(){
+            while(true){
+                try {
+                    String msg = din.readUTF();
+                    if(msg.contains(USER_LIST_CODE)){
+                        msg = msg.substring(6);
+                        dlm.clear();
+                        StringTokenizer str = new StringTokenizer(msg, ",");
+                        while(str.hasMoreTokens()){
+                            String u = str.nextToken();
+                            if(!userName.equals(u)){
+                                dlm.addElement(u);
+                            }
+                        }
+                    }
+                    else {
+                        jTextAreaHistory.append(msg + "\n");
+                    }
+                }
+                catch (Exception e){
+                    break;
+                }
+            }
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -38,30 +89,82 @@ public class ClientGui extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextHistory = new javax.swing.JTextPane();
-        jTextInput = new javax.swing.JTextField();
-        jLabelUserName = new javax.swing.JLabel();
-        jLabelRoomName = new javax.swing.JLabel();
+        jTextArea1 = new javax.swing.JTextArea();
         jButtonLogout = new javax.swing.JButton();
+        jLabelRoomName = new javax.swing.JLabel();
+        jLabelUserName = new javax.swing.JLabel();
+        jTextFieldInput = new javax.swing.JTextField();
+        jButtonSend = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTextAreaHistory = new javax.swing.JTextArea();
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jListUsers = new javax.swing.JList<>();
+        jButtonUnselect = new javax.swing.JButton();
+
+        jTextArea1.setColumns(10);
+        jTextArea1.setRows(5);
+        jScrollPane1.setViewportView(jTextArea1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jScrollPane1.setViewportView(jTextHistory);
-
-        jTextInput.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextInputActionPerformed(evt);
+        setTitle("Group Chat Chill Chill - Client");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
             }
         });
-
-        jLabelUserName.setText("jLabelName");
-
-        jLabelRoomName.setText("jLabel2");
 
         jButtonLogout.setText("Logout");
         jButtonLogout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonLogoutActionPerformed(evt);
+            }
+        });
+
+        jLabelRoomName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelRoomName.setText("jLabel1");
+
+        jLabelUserName.setText("jLabel2");
+
+        jTextFieldInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sendMessage(evt);
+            }
+        });
+
+        jButtonSend.setText("Send");
+        jButtonSend.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sendMessage(evt);
+            }
+        });
+
+        jTextAreaHistory.setEditable(false);
+        jTextAreaHistory.setColumns(20);
+        jTextAreaHistory.setLineWrap(true);
+        jTextAreaHistory.setRows(5);
+        jTextAreaHistory.setMaximumSize(new java.awt.Dimension(113, 21));
+        jScrollPane3.setViewportView(jTextAreaHistory);
+
+        jLabel1.setText("Online users:");
+
+        jListUsers.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jListUsers.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jListUsersValueChanged(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jListUsers);
+
+        jButtonUnselect.setText("Unselect");
+        jButtonUnselect.setEnabled(false);
+        jButtonUnselect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonUnselectActionPerformed(evt);
             }
         });
 
@@ -72,58 +175,162 @@ public class ClientGui extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jLabelUserName, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextInput))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButtonLogout)
-                        .addGap(99, 99, 99)
-                        .addComponent(jLabelRoomName)
-                        .addGap(0, 182, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabelRoomName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabelUserName)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextFieldInput)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonSend, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonUnselect)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(9, 9, 9)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jButtonLogout)
+                        .addComponent(jLabelRoomName))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelRoomName)
-                    .addComponent(jButtonLogout))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonSend)
+                    .addComponent(jTextFieldInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabelUserName)
-                    .addComponent(jTextInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButtonUnselect))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextInputActionPerformed
-        String history = jTextHistory.getText();
-        if (history.isEmpty())
-            jTextHistory.setText(jTextInput.getText());
-        else
-            jTextHistory.setText(history + "\n" + jTextInput.getText());
-    }//GEN-LAST:event_jTextInputActionPerformed
-
     private void jButtonLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLogoutActionPerformed
-        appchat.Login login = new appchat.Login();
-        login.setVisible(true);
-        this.setVisible(false);
+        // TODO add your handling code here:
+        try {
+            dout.writeUTF(TERMINATE_CODE);
+            this.dispose();
+            new Login().setVisible(true);
+        }
+        catch (Exception e){
+            Logger.getLogger(ClientGui.class.getName()).log(Level.SEVERE, null, e);
+        }
     }//GEN-LAST:event_jButtonLogoutActionPerformed
+
+    private void sendMessage(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendMessage
+        // TODO add your handling code here:
+        try {
+            String msg = jTextFieldInput.getText();
+            if(!privateUserName.isEmpty()){
+                String serverMsg = PRIVATE_MESSAGE_CODE + privateUserName + ":" + msg;
+                dout.writeUTF(serverMsg);
+                jTextFieldInput.setText("");
+                jTextAreaHistory.append("You to [" + privateUserName + "]: " + msg + "\n");
+            }
+            else {
+                dout.writeUTF(msg);
+                jTextFieldInput.setText("");
+                jTextAreaHistory.append("You: " + msg + "\n");
+            }
+        }
+        catch (Exception e){
+            JOptionPane.showMessageDialog(this, "User does not exist anymore.");
+        }
+    }//GEN-LAST:event_sendMessage
+
+    private void jListUsersValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jListUsersValueChanged
+        // TODO add your handling code here:
+        String selectedUser = jListUsers.getSelectedValue();
+        if(selectedUser != null){
+            privateUserName = selectedUser;
+            jButtonUnselect.setEnabled(true);
+        }
+        else {
+            privateUserName = "";
+            jButtonUnselect.setEnabled(false);
+        }
+    }//GEN-LAST:event_jListUsersValueChanged
+
+    private void jButtonUnselectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUnselectActionPerformed
+        // TODO add your handling code here:
+        jListUsers.clearSelection();
+    }//GEN-LAST:event_jButtonUnselectActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        try {
+            dout.writeUTF(TERMINATE_CODE);
+            this.dispose();
+        }
+        catch (Exception e){
+            Logger.getLogger(ClientGui.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_formWindowClosing
+            
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ClientGui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ClientGui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ClientGui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ClientGui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new ClientGui().setVisible(true);
+            }
+        });
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonLogout;
+    private javax.swing.JButton jButtonSend;
+    private javax.swing.JButton jButtonUnselect;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabelRoomName;
     private javax.swing.JLabel jLabelUserName;
+    private javax.swing.JList<String> jListUsers;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextPane jTextHistory;
-    private javax.swing.JTextField jTextInput;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea jTextAreaHistory;
+    private javax.swing.JTextField jTextFieldInput;
     // End of variables declaration//GEN-END:variables
 }
