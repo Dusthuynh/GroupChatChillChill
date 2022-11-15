@@ -13,9 +13,9 @@
 
 ## Tài liệu báo cáo
 
-### [Đặc tả yêu cầu phần mềm](https://docs.google.com/document/d/1DTLvO9GxhpDpM-NzxzX72FqHBNvg_ftC/edit?usp=sharing&ouid=103154574539642648653&rtpof=true&sd=true)
+### [Đặc tả yêu cầu phần mềm](https://docs.google.com/document/d/1DTLvO9GxhpDpM-NzxzX72FqHBNvg_ftC/edit?usp=sharing&ouid=103154574539642648653&rtpof=true&sd=true){:target="_blank"}
 
-### [Tài liệu thiết kế phần mềm phần mềm](https://docs.google.com/document/d/1BzvCu0axU3Ye-LdARsfchaKxCM_CmNKz/edit?usp=sharing&ouid=103154574539642648653&rtpof=true&sd=true)
+### [Tài liệu thiết kế phần mềm phần mềm](https://docs.google.com/document/d/1BzvCu0axU3Ye-LdARsfchaKxCM_CmNKz/edit?usp=sharing&ouid=103154574539642648653&rtpof=true&sd=true){:target="_blank"}
 
 ---
 
