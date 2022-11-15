@@ -65,7 +65,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jButtonUnselect" min="-2" max="-2" attributes="0"/>
                   <Component id="jScrollPane2" min="-2" pref="86" max="-2" attributes="0"/>
-                  <Component id="jLabel1" min="-2" pref="86" max="-2" attributes="0"/>
+                  <Component id="jLabelUserOnline" min="-2" pref="86" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -80,7 +80,7 @@
                       <Component id="jButtonLogout" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabelRoomName" alignment="3" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jLabel1" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabelUserOnline" alignment="1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -111,12 +111,12 @@
     <Component class="javax.swing.JLabel" name="jLabelRoomName">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="0"/>
-        <Property name="text" type="java.lang.String" value="jLabel1"/>
+        <Property name="text" type="java.lang.String" value="Room Name"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabelUserName">
       <Properties>
-        <Property name="text" type="java.lang.String" value="jLabel2"/>
+        <Property name="text" type="java.lang.String" value="userName"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="jTextFieldInput">
@@ -152,7 +152,7 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Component class="javax.swing.JLabel" name="jLabelUserOnline">
       <Properties>
         <Property name="text" type="java.lang.String" value="Online users:"/>
       </Properties>
